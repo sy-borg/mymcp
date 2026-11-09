@@ -29,6 +29,29 @@ if unset, the current working directory is used.
 FILESYSTEM_ROOTS=/home/sa/src:/home/sa/Documents .venv/bin/python -m servers.filesystem
 ```
 
+Note: an unrestricted root defeats the purpose — one served project can edit
+files in anything under the same root.
+
+### websearch
+
+Searches the web (DuckDuckGo), Wikipedia, and the Arch Linux repository, and
+fetches any page — all rendered to plain text through a local text browser
+(`w3m`/`lynx`). Results keep a numbered reference list of URLs, so agents can
+follow up with `fetch_page`. Fresh results are not cached; DuckDuckGo's
+redirect links are unwrapped to real URLs.
+
+Tools: `search_web`, `search_wikipedia`, `search_arch_packages`, `fetch_page`.
+Browser selection tries `WEBSEARCH_BROWSER` → lynx → w3m → links;
+`browser="auto"` per call unless overridden. Needs one of `w3m`, `lynx`,
+`links` installed (e.g. `pacman -S w3m`).
+
+```sh
+WEBSEARCH_BROWSER=w3m .venv/bin/python -m servers.websearch
+```
+
+No new Python dependencies: pages are fetched with the standard library and
+only rendered by the external browser.
+
 ## Adding another server
 
 1. Create `servers/<name>.py` with a `FastMCP` instance called `mcp` and a
@@ -62,6 +85,14 @@ Alternatively, register from the shell (where `$HOME` *does* expand):
 opencode mcp add filesystem --global \
   --env "FILESYSTEM_ROOTS=$HOME/src" \
   -- /home/sa/src/mymcp/.venv/bin/python -m servers.filesystem
+```
+
+Alternatively, register from the shell (where `$HOME` *does* expand) — using
+the absolute script path means the server also works from any workspace:
+
+```sh
+opencode mcp add websearch --global -- \
+  /home/sa/src/mymcp/.venv/bin/python /home/sa/src/mymcp/servers/websearch.py
 ```
 
 Then check the connection:
