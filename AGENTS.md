@@ -11,6 +11,11 @@
   .venv/bin/pip install fastmcp
   ```
 - **FastMCP** is the only runtime dependency.  No other packages may be installed system‑wide; use the `.venv` pip.
+- **markitdown** is an exception by request ( converts files to Markdown for agents ) and lives only in the `.venv`:
+  ```sh
+  .venv/bin/pip install "markitdown[all]"
+  ```
+  The smoke test additionally uses `python-docx` to build a test `.docx`.
 - **Websearch** requires an external text browser.  Install one of:
   ```sh
   pacman -S w3m  # or lynx, or links
@@ -31,6 +36,7 @@ Examples:
 - Filesystem: `.venv/bin/python -m servers.filesystem`
 - Websearch:  `.venv/bin/python -m servers.websearch`
 - Memory:     `.venv/bin/python -m servers.memory`
+- MarkItDown: `.venv/bin/python -m servers.markitdown`
 
 ### 3. Environment variables
 | Variable | Purpose | Default (if unset) |
@@ -38,6 +44,7 @@ Examples:
 | `FILESYSTEM_ROOTS` | Colon‑separated list of root directories the filesystem server may access.  If unset, the current working directory is used. | `.` |
 | `WEBSEARCH_BROWSER` | Preferred browser for rendering pages.  The server falls back to `lynx → w3m → links`. | – |
 | `MEMORY_PATH` | File path to the JSON graph.  If unset, `$XDG_DATA_HOME/mymcp‑memory/graph.json` (~ `~/.local/share/mymcp‑memory/graph.json`) is used. | – |
+| `FILESYSTEM_ROOTS` (for `servers.markitdown`) | Allowed input directories for file conversion; same roots as the filesystem server. | `.` |
 
 **Tip:** For tests that touch the memory graph, set `MEMORY_PATH` to a temporary file so the test doesn’t alter the user‑graph.
 

@@ -68,6 +68,26 @@ relations), `read_graph`, `search_nodes`, `open_nodes`. Writes are atomic.
 .venv/bin/python -m servers.memory
 ```
 
+### markitdown
+
+Converts files to Markdown (via Microsoft's
+[markitdown](https://github.com/microsoft/markitdown)) so agents can consume
+them: PDF, Word (.docx), Excel (.xlsx), PowerPoint (.pptx), HTML, CSV, JSON,
+XML, EPUB, ZIP listings, images (via OCR), and more. Input files must live
+under the allowed roots — the same colon-separated `FILESYSTEM_ROOTS` env var
+the filesystem server uses (cwd by default), so the two servers interoperate.
+
+Tools: `convert_file` (path → Markdown, truncated to `max_chars`),
+`convert_string` (in-memory content + file extension → Markdown),
+`list_allowed_roots`.
+
+```sh
+FILESYSTEM_ROOTS=/home/sa/src:/home/sa/Documents .venv/bin/python -m servers.markitdown
+```
+
+Dependency: `pip install "markitdown[all]"` into `.venv` (plus `python-docx`,
+needed only by `smoke_test_markitdown.py` to build the test `.docx`).
+
 ## Adding another server
 
 1. Create `servers/<name>.py` with a `FastMCP` instance called `mcp` and a
