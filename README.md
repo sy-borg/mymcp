@@ -52,6 +52,22 @@ WEBSEARCH_BROWSER=w3m .venv/bin/python -m servers.websearch
 No new Python dependencies: pages are fetched with the standard library and
 only rendered by the external browser.
 
+### memory
+
+Persistent knowledge-graph memory, stored as JSON (entities with
+observations, plus typed relations between them) at
+`$MEMORY_PATH` or `$XDG_DATA_HOME/mymcp-memory/graph.json`
+(~/.local/share/mymcp-memory/graph.json by default).
+
+Tools: `create_entities` (merges observations into known entities),
+`create_relations` (deduplicated, both ends must exist),
+`add_observations` / `delete_observations`, `delete_entities` (cascades its
+relations), `read_graph`, `search_nodes`, `open_nodes`. Writes are atomic.
+
+```sh
+.venv/bin/python -m servers.memory
+```
+
 ## Adding another server
 
 1. Create `servers/<name>.py` with a `FastMCP` instance called `mcp` and a
