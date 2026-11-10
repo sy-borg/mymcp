@@ -37,7 +37,7 @@ mcp = FastMCP(
     ),
 )
 
-USER_AGENT = "opencode-websearch-mcp/1.0 (local MCP server)"
+USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:159.0) Gecko/20100101 Firefox/159.0"
 MAX_HTML_BYTES = 3_000_000
 MAX_TEXT_CHARS = 50_000
 HTTP_TIMEOUT = 20
