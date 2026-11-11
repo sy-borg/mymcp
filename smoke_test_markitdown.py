@@ -70,6 +70,53 @@ async def main() -> None:
         assert "Inline" in blob, blob
         print("convert_string ✓")
 
+        # convert_url via a local HTTP server (hermetic, no internet needed).
+        import threading
+        import http.server
+
+        url_dir = test_dir / "urlroot"
+        url_dir.mkdir()
+        (url_dir / "page.html").write_text(
+            "<h1>URL Title</h1><p>Served over HTTP.</p>", encoding="utf-8"
+        )
+
+        class Handler(http.server.SimpleHTTPRequestHandler):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, directory=str(url_dir), **kwargs)
+
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        port = server.server_address[1]
+        try:
+            url_md = (await client.call_tool(
+                "convert_url",
+                {"url": f"http://127.0.0.1:{port}/page.html"},
+            )).content[0].text
+            assert "URL Title" in url_md and "Served over HTTP." in url_md, url_md
+            print("convert_url ✓")
+
+            # Non-http schemes must be refused.
+            try:
+                await client.call_tool("convert_url", {"url": "ftp://example.com/x"})
+                print("bad scheme NOT rejected ✗")
+            except Exception:
+                print("bad scheme rejected ✓")
+
+            # Oversized downloads must be refused.
+            try:
+                await client.call_tool(
+                    "convert_url",
+                    {"url": f"http://127.0.0.1:{port}/page.html", "max_bytes": 10},
+                )
+                print("max_bytes NOT enforced ✗")
+            except Exception:
+                print("max_bytes enforced ✓")
+        finally:
+            server.shutdown()
+            (url_dir / "page.html").unlink()
+            url_dir.rmdir()
+
         # Escaping the root must be refused.
         try:
             await client.call_tool(
