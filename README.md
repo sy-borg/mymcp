@@ -59,10 +59,16 @@ observations, plus typed relations between them) at
 `$MEMORY_PATH` or `$XDG_DATA_HOME/mymcp-memory/graph.json`
 (~/.local/share/mymcp-memory/graph.json by default).
 
+Every tool takes an optional `scope`. The default scope `global` uses the
+path above; any other scope is a project-specific graph stored as a sibling
+`scopes/<scope>.json` file. Use `global` for cross-project knowledge and a
+project-named scope (e.g. the repo name) for project-specific memory.
+
 Tools: `create_entities` (merges observations into known entities),
 `create_relations` (deduplicated, both ends must exist),
 `add_observations` / `delete_observations`, `delete_entities` (cascades its
-relations), `read_graph`, `search_nodes`, `open_nodes`. Writes are atomic.
+relations), `read_graph`, `search_nodes`, `open_nodes`, plus
+`list_scopes` and `delete_scope` for scope housekeeping. Writes are atomic.
 
 ```sh
 .venv/bin/python -m servers.memory

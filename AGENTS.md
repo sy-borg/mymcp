@@ -43,10 +43,12 @@ Examples:
 |---|---|---|
 | `FILESYSTEM_ROOTS` | Colon‑separated list of root directories the filesystem server may access.  If unset, the current working directory is used. | `.` |
 | `WEBSEARCH_BROWSER` | Preferred browser for rendering pages.  The server falls back to `lynx → w3m → links`. | – |
-| `MEMORY_PATH` | File path to the JSON graph.  If unset, `$XDG_DATA_HOME/mymcp‑memory/graph.json` (~ `~/.local/share/mymcp‑memory/graph.json`) is used. | – |
+| `MEMORY_PATH` | File path to the JSON graph of the default `global` scope.  Other scopes live as sibling files under a `scopes/` directory next to this path.  If unset, `$XDG_DATA_HOME/mymcp‑memory/graph.json` (~ `~/.local/share/mymcp‑memory/graph.json`) is used. | – |
 | `FILESYSTEM_ROOTS` (for `servers.markitdown`) | Allowed input directories for file conversion; same roots as the filesystem server. | `.` |
 
 **Tip:** For tests that touch the memory graph, set `MEMORY_PATH` to a temporary file so the test doesn’t alter the user‑graph.
+
+**Memory scopes:** every memory tool accepts an optional `scope` parameter.  Use the default `global` scope for cross‑project knowledge and a project‑named scope (e.g. the repo name) for project‑specific memory; each scope is its own JSON file under `scopes/`.  `list_scopes` and `delete_scope` manage the set of scopes.
 
 ### 4. Opencode registration
 OpenCode expects a global config file `~/.config/opencode/opencode.json`.  To register a server manually:

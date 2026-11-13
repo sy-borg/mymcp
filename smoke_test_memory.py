@@ -85,6 +85,39 @@ async def main() -> None:
         except ValidationError:
             print("validation barrier ✓")
 
+        # Scopes: project-specific graph is isolated from 'global'
+        await client.call_tool("create_entities", {
+            "entities": [Entity(name="mymcp", entityType="project", observations=["scoped entry"])],
+            "scope": "mymcp",
+        })
+        g_global = eval_result((await client.call_tool("read_graph", {})).content)
+        g_scoped = eval_result((await client.call_tool("read_graph", {"scope": "mymcp"})).content)
+        assert len(g_global["entities"]) == 1 and len(g_scoped["entities"]) == 1
+        assert g_global["entities"][0]["name"] == "sa"
+        assert g_scoped["entities"][0]["observations"] == ["scoped entry"]
+        print("scope isolation ✓")
+
+        scopes = eval_result((await client.call_tool("list_scopes", {})).content)
+        names = {s["scope"] for s in scopes["scopes"]}
+        assert {"global", "mymcp"} <= names
+        print("list_scopes:", [(s["scope"], s["entities"]) for s in scopes["scopes"]])
+
+        # Invalid scope names are refused
+        try:
+            await client.call_tool("read_graph", {"scope": "../escape"})
+        except Exception:
+            print("invalid scope refused ✓")
+
+        # delete_scope removes the per-scope file, refuses for 'global'
+        try:
+            await client.call_tool("delete_scope", {"scope": "global"})
+        except Exception:
+            print("global scope protected ✓")
+        await client.call_tool("delete_scope", {"scope": "mymcp"})
+        scopes = eval_result((await client.call_tool("list_scopes", {})).content)
+        assert "mymcp" not in {s["scope"] for s in scopes["scopes"]}
+        print("delete_scope ✓")
+
     path.unlink(missing_ok=True)
     print("all checks passed")
 
